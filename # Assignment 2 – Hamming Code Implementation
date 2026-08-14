@@ -1,89 +1,81 @@
 #include <iostream>
 #include <string>
-#include <cmath>
 using namespace std;
 
 int main() {
-    string data;
+    string dataBits;
 
     cout << "Enter 4 bit binary data: ";
-    cin >> data;
+    cin >> dataBits;
 
-    if (data.size() != 4) {
+    if (dataBits.size() != 4) {
         cout << "Invalid input. Enter exactly 4 bits." << endl;
         return 0;
     }
 
-    for (int i = 0; i < 4; i++) {
-        if (data[i] != '0' && data[i] != '1') {
+    for (char bit : dataBits) {
+        if (bit != '0' && bit != '1') {
             cout << "Invalid input. Only 0 and 1 are allowed." << endl;
             return 0;
         }
     }
 
-    int m = data.size();
-    int r = 0;
+    int m = 4, r = 0;
 
-    while (pow(2, r) < (m + r + 1)) {
+    while ((1 << r) < m + r + 1)
         r++;
-    }
 
-    cout << "Data Bits:" << data << endl;
+    cout << "Data Bits:" << dataBits << endl;
     cout << "Number of Parity bits:" << r << endl;
 
-    char hamming[8];
+    char code[8];
 
-    hamming[1] = 'P';
-    hamming[2] = 'P';
-    hamming[3] = data[3];
-    hamming[4] = 'P';
-    hamming[5] = data[2];
-    hamming[6] = data[1];
-    hamming[7] = data[0];
+    code[1] = 'P';
+    code[2] = 'P';
+    code[4] = 'P';
+
+    code[3] = dataBits[3];
+    code[5] = dataBits[2];
+    code[6] = dataBits[1];
+    code[7] = dataBits[0];
 
     cout << "\nHamming code positions:" << endl;
 
-    for (int i = 1; i <= 7; i++) {
-        cout << "Position " << i << ": " << hamming[i] << endl;
-    }
+    for (int pos = 1; pos <= 7; pos++)
+        cout << "Position " << pos << ": " << code[pos] << endl;
 
-    for (int p = 1; p <= 4; p = p * 2) {
-        int parity = 0;
+    int p = 1;
+
+    while (p <= 4) {
+        int result = 0;
 
         cout << "P" << p << " checks positions: ";
 
-        for (int i = 1; i <= 7; i++) {
-            int temp = i;
-            int bit = p;
+        for (int pos = 1; pos <= 7; pos++) {
+            if ((pos & p) == p) {
+                cout << pos << " ";
 
-            while (bit > 1) {
-                temp = temp / 2;
-                bit = bit / 2;
-            }
-
-            if (temp % 2 == 1) {
-                cout << i << " ";
-
-                if (i != p) {
-                    parity = parity ^ (hamming[i] - '0');
-                }
+                if (pos != p)
+                    result ^= code[pos] - '0';
             }
         }
 
-        hamming[p] = parity + '0';
-        cout << "-> P" << p << " = " << hamming[p] << endl;
+        code[p] = result + '0';
+
+        cout << "-> P" << p << " = " << code[p] << endl;
+
+        p *= 2;
     }
 
     cout << "\nParity Bits:" << endl;
-    cout << "P1 = " << hamming[1] << endl;
-    cout << "P2 = " << hamming[2] << endl;
-    cout << "P3 = " << hamming[4] << endl;
+    cout << "P1 = " << code[1] << endl;
+    cout << "P2 = " << code[2] << endl;
+    cout << "P3 = " << code[4] << endl;
 
     cout << "\nFinal Hamming Code: ";
 
-    for (int i = 1; i <= 7; i++) {
-        cout << hamming[i];
-    }
+    for (int pos = 1; pos <= 7; pos++)
+        cout << code[pos];
 
     cout << endl;
 
